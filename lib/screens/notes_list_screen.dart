@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/note_model.dart';
 import '../services/firestore_service.dart';
 import '../widgets/note_card.dart';
-import 'note_editor_screen.dart';
+import 'add_edit_note_screen.dart';
 
 /// Primary Dashboard screen for the Notes app.
 ///
@@ -27,9 +27,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
   Future<void> _openEditor({NoteModel? existing}) async {
     final NoteModel? result = await Navigator.of(context).push<NoteModel>(
       MaterialPageRoute<NoteModel>(
-        builder: (_) => NoteEditorScreen(
+        builder: (_) => AddEditNoteScreen(
           service: widget.service,
-          existing: existing,
+          note: existing,
         ),
       ),
     );
@@ -47,31 +47,8 @@ class _NotesListScreenState extends State<NotesListScreen> {
   }
 
   Future<void> _confirmDelete(NoteModel note) async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Delete note?'),
-        content: Text(
-          note.title.isEmpty
-              ? 'This note will be permanently removed.'
-              : '"${note.title}" will be permanently removed.',
-          style: const TextStyle(color: Color(0xFF9AA0A6)),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5252)),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
+    final bool confirmed = await showDeleteNoteConfirmation(context, note: note);
+    if (!confirmed) return;
 
     try {
       await widget.service.deleteNote(note.id!);
