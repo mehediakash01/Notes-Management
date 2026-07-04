@@ -94,7 +94,7 @@ class NotesApp extends StatelessWidget {
       ),
     );
 
-    final CardTheme cardTheme = CardTheme(
+    final CardThemeData cardTheme = CardThemeData(
       color: surfaceDarkCharcoal,
       elevation: 2,
       margin: EdgeInsets.zero,
@@ -177,7 +177,7 @@ class NotesApp extends StatelessWidget {
         contentTextStyle: TextStyle(color: textHigh),
         behavior: SnackBarBehavior.floating,
       ),
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         backgroundColor: surfaceDarkCharcoal,
         titleTextStyle: TextStyle(
           color: textHigh,

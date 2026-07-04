@@ -141,6 +141,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
     return PopScope(
       canPop: !_isLoading,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text(isEditing ? 'Edit Note' : 'New Note'),
           leading: IconButton(
@@ -180,26 +181,37 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         ),
         body: AbsorbPointer(
           absorbing: _isLoading,
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  _buildTitleField(),
-                  const SizedBox(height: 8),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    height: 1,
-                    color: _titleFocused ? _neonTeal : _divider,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildDescriptionLabel(),
-                  const SizedBox(height: 8),
-                  Expanded(child: _buildDescriptionField()),
-                ],
+          child: SafeArea(
+            top: false,
+            child: Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    _buildTitleField(),
+                    const SizedBox(height: 8),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      height: 1,
+                      color: _titleFocused ? _neonTeal : _divider,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildDescriptionLabel(),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 320,
+                      child: _buildDescriptionField(),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -238,10 +250,18 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         focusedErrorBorder: InputBorder.none,
         disabledBorder: InputBorder.none,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        errorMaxLines: 1,
+        helperMaxLines: 1,
         errorStyle: const TextStyle(
           color: _errorRed,
           fontSize: 12,
+          height: 1.0,
           fontWeight: FontWeight.w500,
+        ),
+        helperStyle: const TextStyle(
+          color: Color(0x00000000),
+          fontSize: 12,
+          height: 1.0,
         ),
       ),
       inputFormatters: <TextInputFormatter>[
@@ -271,7 +291,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
       controller: _descriptionController,
       focusNode: _descriptionFocus,
       enabled: !_isLoading,
-      expands: true,
       maxLines: null,
       minLines: null,
       keyboardType: TextInputType.multiline,
@@ -321,8 +340,16 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         errorStyle: const TextStyle(
           color: _errorRed,
           fontSize: 12,
+          height: 1.0,
           fontWeight: FontWeight.w500,
         ),
+        helperStyle: const TextStyle(
+          color: Color(0x00000000),
+          fontSize: 12,
+          height: 1.0,
+        ),
+        errorMaxLines: 1,
+        helperMaxLines: 1,
       ),
       inputFormatters: <TextInputFormatter>[
         LengthLimitingTextInputFormatter(4000),
