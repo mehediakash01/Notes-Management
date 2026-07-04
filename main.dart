@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'screens/notes_list_screen.dart';
 import 'services/firestore_service.dart';
 
 /// Top-level service handle, injected into the widget tree via
@@ -201,31 +202,22 @@ class NotesApp extends StatelessWidget {
         title: 'Notes',
         debugShowCheckedModeBanner: false,
         theme: _buildTheme(),
-        home: const _PlaceholderHome(),
+        home: const NotesListScreenPlaceholder(),
       ),
     );
   }
 }
 
-/// Placeholder screen. The real list/edit UI is intentionally kept out
-/// of `main.dart` to keep the entry file focused on theme + wiring.
-class _PlaceholderHome extends StatelessWidget {
-  const _PlaceholderHome();
+/// Thin wrapper that resolves the [FirestoreService] from the surrounding
+/// [FirestoreServiceScope] and hands it to the real dashboard. Keeping
+/// `main.dart` service-injection-agnostic lets us swap providers later.
+class NotesListScreenPlaceholder extends StatelessWidget {
+  const NotesListScreenPlaceholder({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Notes')),
-      body: const Center(
-        child: Text(
-          'Notes list will render here.',
-          style: TextStyle(color: NotesApp.textMuted),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
+    return NotesListScreen(
+      service: FirestoreServiceScope.of(context),
     );
   }
 }
