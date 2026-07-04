@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../models/note_model.dart';
 
-/// A single tappable note tile used by [NotesListScreen].
-///
-/// Visuals:
-/// - 16dp rounded corners to match the global card theme.
-/// - Title in bold white, description as a two-line muted snippet.
-/// - Trailing popup menu for edit / delete actions (kept on-card so the
-///   screen doesn't need a per-row gesture detector).
 class NoteCard extends StatelessWidget {
   final NoteModel note;
   final VoidCallback onTap;

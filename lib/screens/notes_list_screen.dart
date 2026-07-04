@@ -5,12 +5,6 @@ import '../services/firestore_service.dart';
 import '../widgets/note_card.dart';
 import 'add_edit_note_screen.dart';
 
-/// Primary Dashboard screen for the Notes app.
-///
-/// Renders a live, ordered list of notes from Cloud Firestore via
-/// [FirestoreService.getNotesStream]. The screen is intentionally
-/// declarative — it owns no caching of its own beyond what the stream
-/// provides, and it never reaches into Firestore directly.
 class NotesListScreen extends StatefulWidget {
   final FirestoreService service;
 
@@ -21,7 +15,6 @@ class NotesListScreen extends StatefulWidget {
 }
 
 class _NotesListScreenState extends State<NotesListScreen> {
-  // Cached last good list so connection blips don't blank the UI.
   List<NoteModel>? _lastNotes;
 
   Future<void> _openEditor({NoteModel? existing}) async {
@@ -79,8 +72,6 @@ class _NotesListScreenState extends State<NotesListScreen> {
         stream: widget.service.getNotesStream(),
         builder: (BuildContext context,
             AsyncSnapshot<List<NoteModel>> snapshot) {
-          // Connection-state UX: keep the last known list visible while
-          // waiting for the next event, instead of flashing a spinner.
           if (snapshot.hasData) {
             _lastNotes = snapshot.data;
           }
@@ -133,15 +124,11 @@ class _NotesListScreenState extends State<NotesListScreen> {
   }
 }
 
-/// Small circular counter rendered in the AppBar's `actions` slot.
-/// Hidden when there are no notes yet.
 class _NotesCountBadge extends StatelessWidget {
   const _NotesCountBadge();
 
   @override
   Widget build(BuildContext context) {
-    // Pull the current list count from the parent screen via the same
-    // stream — keeps the badge live without requiring prop drilling.
     final FirestoreService service = FirestoreServiceScope.of(context);
 
     return Padding(

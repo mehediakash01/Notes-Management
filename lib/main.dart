@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'firebase_options.dart';
 import 'screens/notes_list_screen.dart';
 import 'services/firestore_service.dart';
 
-/// Top-level service handle, injected into the widget tree via
-/// [FirestoreServiceScope]. Keeping Firebase as a single dependency on
-/// `MaterialApp` makes swapping providers (and tests) trivial.
 final FirestoreService firestoreService = FirestoreService();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const NotesApp());
 }
 
-/// Inherited widget that exposes the singleton [FirestoreService]
-/// to descendants without requiring `BuildContext` lookups scattered
-/// across the codebase.
 class FirestoreServiceScope extends InheritedWidget {
   final FirestoreService service;
 
@@ -41,8 +38,6 @@ class FirestoreServiceScope extends InheritedWidget {
 
 class NotesApp extends StatelessWidget {
   const NotesApp({super.key});
-
-  // --- Premium palette -------------------------------------------------
 
   static const Color backgroundDeepSlate = Color(0xFF121214);
   static const Color surfaceDarkCharcoal = Color(0xFF1A1A1E);
@@ -208,9 +203,6 @@ class NotesApp extends StatelessWidget {
   }
 }
 
-/// Thin wrapper that resolves the [FirestoreService] from the surrounding
-/// [FirestoreServiceScope] and hands it to the real dashboard. Keeping
-/// `main.dart` service-injection-agnostic lets us swap providers later.
 class NotesListScreenPlaceholder extends StatelessWidget {
   const NotesListScreenPlaceholder({super.key});
 
@@ -222,8 +214,6 @@ class NotesListScreenPlaceholder extends StatelessWidget {
   }
 }
 
-// Re-export the palette so other files can stay color-consistent without
-// redefining literals.
 extension NotesColors on ColorScheme {
   static const Color backgroundDeepSlate = NotesApp.backgroundDeepSlate;
   static const Color surfaceDarkCharcoal = NotesApp.surfaceDarkCharcoal;

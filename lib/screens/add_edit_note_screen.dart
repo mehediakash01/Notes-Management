@@ -4,15 +4,6 @@ import 'package:flutter/services.dart';
 import '../models/note_model.dart';
 import '../services/firestore_service.dart';
 
-/// Single screen that handles both creating a new note and editing an
-/// existing one.
-///
-/// Pass [note] as `null` to enter the "New Note" flow, or pass an
-/// existing [NoteModel] to enter the "Edit Note" flow — the title,
-/// description and submit copy all switch automatically.
-///
-/// All persistence goes through [FirestoreService]. The UI never
-/// touches Firebase directly.
 class AddEditNoteScreen extends StatefulWidget {
   final FirestoreService service;
   final NoteModel? note;
@@ -50,9 +41,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   void initState() {
     super.initState();
 
-    // Seed controllers when editing an existing note. Trimmed so
-    // leading/trailing whitespace from the dashboard doesn't leak into
-    // the editor.
     final NoteModel? note = widget.note;
     if (note != null) {
       _titleController.text = note.title;
@@ -90,14 +78,10 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   }
 
   Future<void> _onSavePressed() async {
-    // Bail early if a previous save is still in flight.
     if (_isLoading) return;
 
-    // Validate first; if invalid, surface the errors without enabling
-    // the loading state so the user can correct and retry immediately.
     final FormState? form = _formKey.currentState;
     if (form == null || !form.validate()) {
-      // Re-focus the first invalid field for a nicer UX.
       if (_titleController.text.trim().isEmpty) {
         _titleFocus.requestFocus();
       } else {
@@ -112,8 +96,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
 
     setState(() => _isLoading = true);
 
-    // Disable inputs immediately so the user can't double-tap or edit
-    // mid-flight. The Save action and fields respect _isLoading.
     final NoteModel draft = NoteModel(
       id: original?.id,
       title: title,
@@ -136,8 +118,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         ),
       );
 
-      // Pop with the persisted note so callers can react if they need
-      // to (e.g. the dashboard's snackbar).
       Navigator.of(context).pop<NoteModel>(draft);
     } catch (_) {
       if (!mounted) return;
@@ -159,8 +139,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
     final bool isEditing = widget.isEditing;
 
     return PopScope(
-      // Block accidental back-gesture pop while a save is in flight so
-      // we never tear the screen down mid-write.
       canPop: !_isLoading,
       child: Scaffold(
         appBar: AppBar(
@@ -354,12 +332,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   }
 }
 
-/// Reusable confirmation dialog shown by the dashboard's delete action
-/// (and any future caller). Keeping it here means the dashboard doesn't
-/// have to redefine the same destructive-action UX.
-///
-/// Returns `true` if the user confirms, `false` (or `null` on dismiss)
-/// otherwise.
 Future<bool> showDeleteNoteConfirmation(
   BuildContext context, {
   required NoteModel note,
